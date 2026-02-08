@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>simple flower</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+        canvas {
+            display: block;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="flowerCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('flowerCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width, height, centerX, centerY;
+    let tick = 0;
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        centerX = width / 2;
+        centerY = height / 2;
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    function draw() {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, width, height);
+
+        const petals = 6;
+        const layers = 60;
+        
+        tick += 0.02;
+
+        for (let j = 0; j < layers; j++) {
+            const z = (j / layers) - 0.5;
+            const hue = (tick * 50 + j * 3) % 360;
+            
+            ctx.beginPath();
+            ctx.strokeStyle = `hsla(${hue}, 100%, 65%, ${0.8 - Math.abs(z)})`;
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = `hsla(${hue}, 100%, 65%, 0.9)`;
+
+            for (let i = 0; i <= Math.PI * 2; i += 0.04) {
+                const r = (Math.sin(i * petals) * 100 + 150) * 0.6;
+                
+                const x = Math.cos(i) * r;
+                const y = Math.sin(i) * r;
+
+                const rotX = x;
+                const rotY = y * Math.cos(tick) - (z * 200) * Math.sin(tick);
+
+                if (i === 0) {
+                    ctx.moveTo(centerX + rotX, centerY + rotY);
+                } else {
+                    ctx.lineTo(centerX + rotX, centerY + rotY);
+                }
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+</script>
+
+</body>
+</html>
